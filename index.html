@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d0b1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Kémia Labor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23160f3a%22/><text y=%22.9em%22 x=%2212%22 font-size=%2276%22>🧪</text></svg>">
+<style>
+:root{--bg:#0d0b1f;--card:#1a1638;--card2:#241e4d;--line:#352c6b;--tx:#f3f1ff;--mut:#a59fd0;
+--cy:#22e3ff;--mg:#ff3df0;--lime:#9dff3d;--yel:#ffd23d;--red:#ff4d6d;--grn:#35e08a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+body{background:radial-gradient(900px 500px at 80% -10%,#3a1470 0,transparent 60%),radial-gradient(700px 500px at -10% 110%,#0b3a66 0,transparent 60%),var(--bg);background-attachment:fixed}
+#app{max-width:560px;margin:0 auto;min-height:100%;padding:14px 16px 96px;position:relative}
+h1,h2,h3{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;border:0;user-select:none;-webkit-user-select:none}
+.btn{display:block;width:100%;padding:15px 18px;border-radius:16px;font-weight:800;font-size:17px;letter-spacing:.3px;background:var(--cy);color:#06222b;box-shadow:0 5px 0 #0b93a8;transition:transform .06s,box-shadow .06s;text-align:center}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #0b93a8}
+.btn.mg{background:var(--mg);color:#2b0429;box-shadow:0 5px 0 #a3189a}.btn.mg:active{box-shadow:0 1px 0 #a3189a}
+.btn.lime{background:var(--lime);color:#14290a;box-shadow:0 5px 0 #5aa81a}.btn.lime:active{box-shadow:0 1px 0 #5aa81a}
+.btn.yel{background:var(--yel);color:#2e2300;box-shadow:0 5px 0 #b38d10}.btn.yel:active{box-shadow:0 1px 0 #b38d10}
+.btn.ghost{background:var(--card2);color:var(--tx);box-shadow:0 5px 0 #120e2c}.btn.ghost:active{box-shadow:0 1px 0 #120e2c}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.btn small{display:block;font-weight:600;font-size:12.5px;opacity:.75;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.mut{color:var(--mut)}.row{display:flex;align-items:center;gap:10px}.sp{flex:1}
+.gap>*+*{margin-top:12px}
+/* header */
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ava{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--mg),var(--cy));display:grid;place-items:center;font-size:28px;flex:none}
+.hdr .nm{font-weight:900;font-size:18px;line-height:1.1}
+.rank{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--yel);text-transform:uppercase}
+.pill{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:6px 11px;font-weight:800;font-size:14px;white-space:nowrap}
+.bar{height:12px;background:#0a0820;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--lime),var(--cy));border-radius:99px;transition:width .4s}
+/* path */
+.path{display:flex;flex-direction:column;align-items:center;gap:20px;padding:22px 0 10px}
+.node{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;padding:0}
+.node .orb{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;font-size:38px;background:var(--c);box-shadow:0 7px 0 rgba(0,0,0,.45),0 0 26px -4px var(--c);border:4px solid rgba(255,255,255,.25);transition:transform .08s}
+.node:active .orb{transform:translateY(5px)}
+.node.lock .orb{background:#2a2550;box-shadow:0 7px 0 #15122d;filter:grayscale(1);opacity:.7}
+.node.cur .orb{animation:pulse 1.6s infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.node .lb{font-weight:800;font-size:14px;max-width:170px;text-align:center}
+.stars{font-size:15px;letter-spacing:2px}.stars .off{opacity:.22;filter:grayscale(1)}
+.boss .orb{width:108px;height:108px;font-size:50px;border-radius:28px;background:linear-gradient(135deg,#ffd23d,#ff7a3d);--c:#ffb03d}
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(13,11,31,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:5}
+.nav>div{max-width:560px;margin:0 auto;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+.nav button{flex:1;background:none;padding:6px 2px;border-radius:12px;font-size:11.5px;font-weight:800;color:var(--mut)}
+.nav button b{display:block;font-size:23px;font-weight:400}
+.nav button.on{color:var(--cy);background:var(--card)}
+/* zone sheet */
+.back{background:var(--card2);border-radius:12px;padding:9px 13px;font-weight:800}
+.rap{background:linear-gradient(135deg,#2a0f4f,#0f2a4f);border:1px solid var(--mg);border-radius:18px;padding:14px 16px;font-style:italic;font-weight:700;line-height:1.55}
+.rap:before{content:"🎤 RAP-SOR";display:block;font-style:normal;font-size:11px;letter-spacing:2px;color:var(--mg);margin-bottom:4px}
+/* reel cards */
+.reel{position:fixed;inset:0;background:#07061a;z-index:20;display:flex;flex-direction:column}
+.reel .dots{display:flex;gap:4px;padding:12px 14px 6px}.reel .dots i{flex:1;height:4px;border-radius:9px;background:#3a3470}.reel .dots i.on{background:#fff}
+.reel .body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:22px 26px;max-width:560px;margin:0 auto;width:100%}
+.reel .em{font-size:70px;margin-bottom:8px}
+.reel h2{font-size:28px;font-weight:900;margin-bottom:14px;line-height:1.15}
+.reel .tx{font-size:19px;line-height:1.55}
+.reel .tx b{color:var(--cy)}.y{color:var(--yel);font-weight:900;font-style:normal;background:rgba(255,210,61,.13);padding:0 5px;border-radius:6px}
+.reel .tx li{margin:6px 0}.reel .tx ul{padding-left:20px;margin:6px 0}
+.reel .ft{padding:12px 18px calc(18px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto;width:100%;display:flex;gap:10px}
+/* lesson */
+.ltop{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.x{background:none;font-size:22px;color:var(--mut);padding:4px 6px}
+.hearts{font-size:17px;white-space:nowrap}.combo{font-weight:900;color:var(--yel);font-size:14px;white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--mg);text-transform:uppercase;margin-bottom:6px}
+.qt{font-size:22px;font-weight:800;line-height:1.3;margin-bottom:18px}
+.opts{display:grid;gap:11px}
+.opt{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:15px 16px;font-size:17px;font-weight:700;text-align:left;box-shadow:0 4px 0 #120e2c}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 #120e2c}
+.opt.ok{border-color:var(--grn);background:#10392a}.opt.no{border-color:var(--red);background:#42142a}
+.opt.sel{border-color:var(--cy);background:#0f3346}.opt.gone{opacity:.25;pointer-events:none}
+.opt .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--lime);color:#14290a;font-size:14px;margin-right:8px}
+.inp{width:100%;background:#0a0820;border:2px solid var(--line);border-radius:16px;padding:15px 16px;font:inherit;font-size:19px;font-weight:700;color:var(--tx);outline:none;margin-bottom:10px}
+.inp:focus{border-color:var(--cy)}.inp.ok{border-color:var(--grn)}.inp.no{border-color:var(--red)}
+.hint{background:none;color:var(--yel);font-weight:800;padding:8px 0;font-size:15px}
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pairs .opt{font-size:15px;padding:13px 10px;text-align:center}
+.fb{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:16px 16px calc(16px + env(safe-area-inset-bottom));animation:up .18s}
+.fb>div{max-width:528px;margin:0 auto}
+.fb.ok{background:#0f3a2a;border-top:3px solid var(--grn)}.fb.no{background:#451329;border-top:3px solid var(--red)}
+.fb h3{font-size:19px;margin-bottom:4px}.fb p{margin:0 0 12px;font-size:16px;line-height:1.4}
+@keyframes up{from{transform:translateY(100%)}}
+.shake{animation:shake .3s}@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+/* result */
+.big{font-size:74px;text-align:center;line-height:1.1}
+.ctr{text-align:center}
+.grade{font-size:92px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--yel),var(--mg));-webkit-background-clip:text;background-clip:text;color:transparent}
+.loot{display:flex;align-items:center;gap:14px;border-radius:18px;padding:13px 14px;background:var(--card);border:2px solid var(--r)}
+.loot .ic{font-size:40px;width:62px;height:62px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--r) 22%,#0a0820);flex:none}
+.loot .rr{font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--r)}
+.loot.lock{--r:#3a3470;opacity:.55}
+.rev{border-left:4px solid var(--red);padding:8px 12px;background:var(--card);border-radius:0 12px 12px 0;font-size:15px;line-height:1.45}
+.rev.ok{border-color:var(--grn)}
+.rev b{color:var(--lime)}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+#fx i{position:absolute;top:-30px;font-style:normal;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="fx"></div>
+<script>
+"use strict";
+/* ============ TANANYAG ============ */
+/* Forrás: 7. o. kémia tankönyv 2.1 (22-23. o.), 2.2 (24-25. o.) + munkafüzet: A kockacukor vizsgálata (feladatlap) */
+const Z=[
+{id:'z1',n:'Fizikai tulajdonságok',e:'🍬',c:'#ff9a3d',loot:['🥽','Neon védőszemüveg'],
+ rap:['Szín, szag, halmazállapot, ez a fizikai start,','keménység, oldhatóság: mind a listán, rajt!','Olvadáspont, sűrűség: mérhető a rész,','száznyolcvanhat fok a cukornak a mérés!'],
+ cards:[
+ {e:'🔎',t:'Hogyan vizsgálunk egy anyagot?',b:'Megfigyeljük a <b>színét, szagát, halmazállapotát</b>.<br><br>A többit <b>kísérlettel</b> derítjük fel: milyen oldószerben oldódik, mekkora az <b>olvadáspontja</b>, <b>forráspontja</b>, <b>sűrűsége</b>, vezeti-e az elektromos áramot.<br><br>A példa: a közismert <b>répacukor</b>.'},
+ {e:'🍬',t:'A répacukor',b:'A cukrot hazánkban <b>cukorrépából</b>, a trópusi területeken <b>cukornádból</b> nyerik.<br><br>A répacukor és a nádcukor kémiai szempontból <b>azonos vegyület</b>.<br><br>Képlete: <b>C₁₂H₂₂O₁₁</b>'},
+ {e:'📋',t:'Fizikai tulajdonságai',b:'<ul><li>színe: <b>fehér</b></li><li>szaga: <b>szagtalan</b></li><li>halmazállapota: <b>szilárd</b></li><li>oldhatósága: <b>vízben jó</b></li><li>keménysége: <b>viszonylag puha</b></li><li>törhető, aprítható</li></ul>'},
+ {e:'🌡️',t:'Mérhető tulajdonságok',b:'Egyes fizikai tulajdonságok <b>mérhetők</b>: számadattal és mértékegységgel jellemzik az anyagot.<br><br>Olvadáspont: <i class=y>186 °C</i><br>Sűrűség: <i class=y>1,59 g/cm³</i> → <b>lesüllyed a víz aljára</b> (a víznél nagyobb a sűrűsége)'},
+ {e:'🧱',t:'Mi a fizikai tulajdonság?',b:'Az anyag <b>színét, szagát, halmazállapotát, keménységét</b> és <b>oldódásának mértékét</b> az anyag <b>fizikai tulajdonságai</b> közé soroljuk.<br><br>Csak a nagyon sok részecskéből álló <b>anyagi halmazra</b> jellemzők, egyetlen molekulára nem.'}],
+ pairs:[['szín','fehér'],['szag','szagtalan'],['halmazállapot','szilárd'],['oldhatóság','vízben jó'],['olvadáspont','186 °C'],['sűrűség','1,59 g/cm³']]},
+
+{id:'z2',n:'Kémiai tulajdonságok',e:'🔥',c:'#ff4d6d',loot:['🔥','Bunsen-égő Turbo'],
+ rap:['Hevítsd a cukrot: sárgul, barnul, karamell,','kémiai tulajdonság: új anyag lesz, ez kell!','Hamuval meggyújtod: ég, nem áll meg,','szén-dioxid és víz a termék, és kész.'],
+ cards:[
+ {e:'🥄',t:'A cukor a kémcsőben',b:'A cukor hevítésekor <b>olvadás közben sárgul, barnul</b>, a kémcsőből <b>kellemes illatú gázok</b> távoznak.<br><br>Hevítés hatására <b>új anyagokká</b> alakul, amelyek tulajdonságai a kiindulási anyagtól eltérőek. A fő termék a sokféle összetevőből álló <b>karamell</b>.'},
+ {e:'🕯️',t:'A cukor égése',b:'Lángba tartva a répacukor <b>nem gyullad meg</b>. <b>Hamuban megforgatva</b> azonban <b>elégethető</b>.<br><br>Ekkor <b>szén-dioxid-gáz</b> és <b>vízgőz</b> keletkezik.'},
+ {e:'👻',t:'Láthatatlan termékek',b:'Az égéstermékek <b>színtelenek és szagtalanok</b>, ezért nem látjuk őket. Csak további kísérletekkel bizonyosodhatunk meg róluk.<br><br>A <b>vízpára megjelenése a hideg üvegen</b> <b>vízgőz</b> keletkezésére utal.'},
+ {e:'📖',t:'Mi a kémiai tulajdonság?',b:'Az anyag azon tulajdonságait, amelyek megmutatják, hogy <b>milyen körülmények között</b> alakul át, és <b>közben milyen anyag keletkezik</b>, <b>kémiai tulajdonságoknak</b> nevezzük.'},
+ {e:'🍬',t:'A cukor 2 kémiai tulajdonsága',b:'<ol><li><b>Melegítés hatására bomlik</b>: sokféle vegyületet tartalmazó <b>karamell</b> alakul, erős hevítésre <b>elszenesedik</b>.</li><li><b>Hamuval bevonva meggyújtható</b>: a levegő <b>oxigénjével</b> lép reakcióba, és <b>szén-dioxiddá</b>, illetve <b>vízzé</b> ég el.</li></ol>'}],
+ pairs:[['hevítés hatására','bomlik, karamell lesz'],['hamuban megforgatva','meggyullad'],['a cukor égéstermékei','szén-dioxid és víz'],['erős hevítés után marad','szén'],['hideg üvegen megjelenik','vízgőz'],['az égéshez kell','oxigén']]},
+
+{id:'z3',n:'Fizikai és kémiai változások',e:'🔄',c:'#22e3ff',loot:['🧤','Laborkesztyű Pro'],
+ rap:['Aprítod, oldod, olvasztod: fizikai,','új anyag nincs, a cukor marad ugyanaz, na!','Ha új anyag jön, az kémiai, reakció a név,','a részecske is változik – ez a lényeg, érzed?'],
+ cards:[
+ {e:'🔨',t:'Fizikai változás',b:'A répacukor <b>aprítás</b>, vízben való <b>oldás</b> vagy <b>enyhe olvasztás</b> során nem alakul át más anyaggá, <b>répacukor marad</b>.<br><br>Az ilyen változások a <b>fizikai változások</b>: <b>nem keletkezik új anyag</b>.'},
+ {e:'🧊',t:'Példák',b:'A legismertebb fizikai változások:<ul><li><b>halmazállapot-változások</b></li><li><b>oldódási folyamatok</b></li></ul>Csak az <b>anyagi halmaz</b> szerkezetében történik változás, a <b>részecske</b> szerkezetében nem.'},
+ {e:'💥',t:'Kémiai változás',b:'Erősebb hevítés vagy égetés során nemcsak a halmaz szerkezete, hanem a <b>molekulák szerkezete</b> is megváltozik.<br><br>A cukrot alkotó <b>atomok más molekulákká kapcsolódnak össze</b>, így <b>új anyagok</b> keletkeznek.'},
+ {e:'⚗️',t:'Reakció',b:'Azokat a változásokat, amelyek során <b>új anyag keletkezik</b>, <b>kémiai változásoknak</b> nevezzük.<br><br>A kémiai változásokat egyszerűen csak <b>reakcióknak</b> hívjuk.'},
+ {e:'⚖️',t:'Összehasonlítás',b:'<table><tr><th></th><th>fizikai</th><th>kémiai</th></tr><tr><td>új anyag?</td><td><b>nem</b></td><td><b>igen</b></td></tr><tr><td>halmaz szerkezete</td><td>változik</td><td>változik</td></tr><tr><td>részecske szerkezete</td><td><b>nem</b> változik</td><td><b>változik</b></td></tr></table>'}],
+ pairs:[['fizikai változás','nem keletkezik új anyag'],['kémiai változás','új anyag keletkezik'],['reakció','a kémiai változás másik neve'],['halmazállapot-változás','pl. olvadás'],['cukor égése','kémiai változás példája']]},
+
+{id:'z4',n:'Magnézium és hipermangán',e:'⚖️',c:'#b07cff',loot:['🧥','Laborköpeny Limited'],
+ rap:['Magnézium ezüst, jó fém, hajlik, nem oldódik,','hat-ötven az olvadás, egy-hetvennégy a sűrűség a kódja.','Hipermangán lilás, vízben lila lesz,','kettő-hetvenegy a súly, hevítve bomlik – ez a teszt!'],
+ cards:[
+ {e:'🪙',t:'A magnézium',b:'A magnézium (vegyjele: <b>Mg</b>) <b>ezüstszürke</b>, szagtalan, szilárd, vízben <b>nem oldódó</b>, a víznél nagyobb sűrűségű <b>fém</b>.<br><br>Jó hajlíthatósága, megmunkálhatósága és elektromos vezetése a <b>fémek jellemző tulajdonságait</b> mutatja.'},
+ {e:'🟣',t:'A hipermangán',b:'Tudományos neve: <b>kálium-permanganát</b>, képlete: <b>KMnO₄</b>.<br><br><b>Lilásszürke</b>, szagtalan, szilárd vegyület, vízben <b>lila</b> színnel oldódik. Sűrűsége nagyobb a vízénél, kristályai lesüllyednek.<br>Dörzsmozsárban könnyen porítható, törik, az elektromos áramot <b>nem vezeti</b>.'},
+ {e:'📊',t:'Az összehasonlító táblázat',b:'<table style="font-size:14px"><tr><th></th><th>Mg</th><th>KMnO₄</th></tr><tr><td>színe</td><td>ezüstszürke</td><td>lilásszürke</td></tr><tr><td>szaga</td><td>szagtalan</td><td>szagtalan</td></tr><tr><td>halmazáll.</td><td>szilárd</td><td>szilárd</td></tr><tr><td>olvadás-, forráspont</td><td>650 °C, 1107 °C</td><td>hevítésre bomlik</td></tr><tr><td>vízben</td><td>nem oldódik</td><td>oldódik</td></tr><tr><td>sűrűség</td><td>1,74 g/cm³</td><td>2,71 g/cm³</td></tr><tr><td>megmunkálható</td><td>jó</td><td>rossz</td></tr></table>'},
+ {e:'📸',t:'A vaku őse',b:'Az 1800-as években <b>Robert Bunsen</b> javasolta a magnézium használatát <b>fényképezés</b> során <b>fényforrásként</b>.<br><br>Az égő magnézium lángjába <b>belenézni nem szabad</b>, mert <b>látáskárosodást</b> okozhat!'},
+ {e:'🎯',t:'Hogyan hasonlítunk össze?',b:'Két anyag tulajdonságait mindig <b>meghatározott szempontok</b> szerint hasonlítjuk össze: szín, szag, halmazállapot, olvadás- és forráspont, oldhatóság, sűrűség, megmunkálhatóság.<br><br>Ez segíti az anyagok <b>csoportosítását</b> és a szerkezetük megállapítását.'}],
+ pairs:[['magnézium színe','ezüstszürke'],['hipermangán színe','lilásszürke'],['magnézium sűrűsége','1,74 g/cm³'],['hipermangán sűrűsége','2,71 g/cm³'],['magnézium olvadáspontja','650 °C'],['magnézium forráspontja','1107 °C'],['KMnO₄','hipermangán'],['Mg','magnézium']]},
+
+{id:'z5',n:'Egyesülés és bomlás',e:'💥',c:'#ffd23d',loot:['💥','Magnézium Flash vaku'],
+ rap:['Kettőből egy: egyesülés, magnézium és oxigén,','magnézium-oxid lesz, fehér por a fény helyén.','Egyből kettő vagy több: bomlás a neve,','hipermangán hevítve oxigént ad le.'],
+ cards:[
+ {e:'⚡',t:'A magnézium égése',b:'Lángba tartva a magnézium <b>vakító fehér fénnyel</b> ég, közben <b>fehér, porszerű magnézium-oxid</b> keletkezik.<br><br>A fehér szín és a porszerű megjelenés jelzi, hogy <b>új anyag</b> jött létre.'},
+ {e:'🔧',t:'Hajlítás, olvasztás vagy égés?',b:'A magnézium <b>hajlítása</b> vagy <b>megolvasztása</b> során a kémiai összetétele <b>nem változik meg</b>.<br><br>Az <b>égése</b> során viszont <b>új anyag</b> (magnézium-oxid) keletkezik.'},
+ {e:'📝',t:'Szóegyenlet',b:'A kémiai folyamatot <b>szóegyenlettel</b> is leírhatjuk:<br><br><b>magnézium + oxigén → magnézium-oxid</b>'},
+ {e:'🤝',t:'Egyesülés',b:'Az olyan kémiai reakciót, amely során <b>két vagy több kiindulási anyagból egy termék</b> keletkezik, <b>egyesülésnek</b> nevezzük.<br><br>Példa: a magnézium égése.'},
+ {e:'🟣',t:'A hipermangán hevítése',b:'Hevítésre nem olvad meg, hanem <b>sercegni, pattogni</b> kezd.<br>A kémcső szájához tartott <b>parázsló gyújtópálca lángra lobban</b> → <b>oxigéngáz</b> képződik.<br><br>A kémcsőben maradó anyag: <b>zöld</b>, vízben oldódó <b>kálium-manganát</b> és <b>fekete</b>, vízben nem oldódó <b>mangán-dioxid</b> keveréke.'},
+ {e:'✂️',t:'Bomlás',b:'Az olyan kémiai változást, amely során <b>egy anyagból két vagy több új anyag</b> keletkezik, <b>bomlásnak</b> nevezzük.<br><br>kálium-permanganát → oxigén + kálium-manganát + mangán-dioxid<br><br>Az egyesülés és a bomlás a kémiai reakciók <b>két legegyszerűbb típusa</b>.'}],
+ pairs:[['egyesülés','több anyagból egy termék'],['bomlás','egy anyagból több termék'],['magnézium + oxigén','magnézium-oxid'],['kálium-permanganát','oxigén + kálium-manganát + mangán-dioxid'],['parázsló gyújtópálca','oxigén kimutatása'],['mangán-dioxid','fekete, vízben nem oldódó']]},
+
+{id:'z6',n:'Energiaváltozások',e:'🌡️',c:'#35e08a',loot:['🌡️','Hőmérő X'],
+ rap:['Hőt ad le: exoterm, mint a magnézium égése,','hőt vesz fel: endoterm, hipermangán bomlása a mérce.','Rendszer és környezet, a hő vándorol,','exo kifelé, endo befelé – ez a szabály, bármikor!'],
+ cards:[
+ {e:'⚡',t:'Mindig van energiaváltozás',b:'A fizikai és kémiai változások <b>mindig energiaváltozással</b> járnak együtt.<br><br>Ez legtöbb esetben <b>hő felszabadulását</b> vagy <b>hő elnyelődését</b> jelenti.'},
+ {e:'🔥',t:'Exoterm',b:'Azokat a változásokat, amelyek során <b>hő szabadul fel</b>, <b>exoterm</b> folyamatoknak nevezzük.<br><br>A rendszer hőt <b>ad át</b> a környezetének.<br><br>Példa: a <b>magnézium égése</b>.'},
+ {e:'🧊',t:'Endoterm',b:'A <b>hőelnyelő</b> folyamatok az <b>endoterm</b> folyamatok.<br><br>A rendszer hőt <b>von el</b> a környezetétől.<br><br>Példa: a <b>hipermangán bomlása</b>.'},
+ {e:'🧭',t:'Merre megy a hő?',b:'<b>Exoterm</b>: a hő a <b>rendszerből a környezet felé</b> áramlik.<br><b>Endoterm</b>: a hő a <b>környezetből a rendszer felé</b> áramlik.<br><br>Emlékeztető: <b>exo</b> = kifelé, <b>endo</b> = befelé.'}],
+ pairs:[['exoterm','hő szabadul fel'],['endoterm','hő nyelődik el'],['magnézium égése','hőt ad le a környezetének'],['hipermangán bomlása','hőt von el a környezetétől']]},
+
+{id:'z7',n:'Labor: a kockacukor',e:'🧪',c:'#3d8bff',loot:['🧪','Arany kémcső'],
+ rap:['Kockacukor a pulton, fémcsipeszbe fogd,','színt, szagot nézd meg, de kóstolni tilos, ez a protokoll!','Száznyolcvanhat fok, ott olvad meg,','karamell, majd szén marad – ezt jegyezd meg!'],
+ cards:[
+ {e:'🥽',t:'Laborszabályok',b:'Előbb gondold végig a <b>laboratóriumi munka szabályait</b>! A kísérleteket <b>feladatonként</b>, a tanár ellenőrzésével végezd.<br><br>A laboratóriumban a közismert cukor is <b>vegyszernek</b> minősül: <b>megkóstolni tilos</b>!'},
+ {e:'👃',t:'1. Érzékszervi vizsgálat',b:'Fogj egy kockacukrot <b>fémcsipeszbe</b>, vizsgáld meg a színét, szagát, halmazállapotát:<br><br><b>fehér, szagtalan, szilárd</b>.<br><br>Ezek <b>fizikai tulajdonságok</b>.'},
+ {e:'🔨',t:'2. Fizikai tulajdonságok',b:'<b>a)</b> A kockacukrot <b>dörzsmozsárban</b> törd porrá: <b>viszonylag könnyen</b> porrá törhető.<br><b>b)</b> A porrá őrölt cukrot oszd két kémcsőbe, az egyikhez önts kevés <b>desztillált vizet</b>: a cukor <b>oldódik</b>.<br><b>c)</b> A másik kémcsövet a <b>felső 1/3 részénél</b> fogd kémcsőfogó csipeszbe, megdöntve óvatosan melegítsd: a cukor <b>megolvad</b>.'},
+ {e:'🎯',t:'3. Olvadáspont becslése',b:'Melyik a helyes érték: 28 °C, 186 °C, 754 °C vagy 1530 °C?<br><br>A répacukor olvadáspontja <i class=y>186 °C</i>.'},
+ {e:'🔥',t:'4/a. Tovább melegítve',b:'A megolvasztott cukrot tovább melegítve a kémcsövön <b>vörösbarna, jó illatú anyag</b> keletkezik: a <b>karamell</b>. A kémcső falán <b>víz</b> csapódik le.<br><br>A hosszabb hevítés végén egy elem marad vissza: <b>fekete, szilárd szén</b>.'},
+ {e:'🕯️',t:'4/b. Hamuval meggyújtva',b:'A hamuban megforgatott cukrot <b>meggyújthatod</b> (a kísérletet a <b>tálca felett</b> végezd!).<br><br>A cukor képlete <b>C₁₂H₂₂O₁₁</b>: szén- és hidrogéntartalma is elég. Keletkezik: <b>szén-dioxid</b> és <b>víz</b>.<br>A <b>száraz, hideg főzőpohárral</b> a <b>vizet</b> azonosítottuk.'}],
+ pairs:[['fémcsipesz','kockacukor megfogása'],['dörzsmozsár','cukor porítása'],['kémcsőfogó csipesz','kémcső melegítése'],['hamu','a cukor meggyújtásához'],['hideg, száraz főzőpohár','vízgőz kimutatása'],['desztillált víz','cukor oldása']]},
+
+{id:'z8',n:'Fogalmak: szótár',e:'📚',c:'#ff3df0',loot:['⚗️','Vegyész lombik'],
+ rap:['Anyagi halmaz: sok részecske együtt, egy csapat,','fizikai: szín, szag, nincs új anyag, nincs vita.','Kémiai: új anyag lesz, reakció a név,','egyesülés, bomlás: két típus – ennyi, érted?'],
+ cards:[
+ {e:'🧫',t:'Anyagi halmaz',b:'Maga az anyag nagyon sok részecske (atom, molekula) <b>halmaza</b>.<br><br>A halmaz tulajdonságai eltérnek az őt felépítő részecskék tulajdonságaitól.'},
+ {e:'🎨',t:'Fizikai tulajdonság',b:'A <b>szín, szag, halmazállapot</b> és <b>oldhatóság</b> a legfontosabb fizikai tulajdonságok. Mérhető még: olvadáspont, forráspont, sűrűség.'},
+ {e:'🧬',t:'Kémiai tulajdonság',b:'Az, hogy az anyag <b>milyen körülmények között milyen anyagokká alakítható át</b>.<br><br>Pl. a cukor hevítésre bomlik, hamuval megforgatva meggyullad.'},
+ {e:'🔨',t:'Fizikai változás',b:'A halmaz szerkezete változik, de <b>új anyag nem képződik</b>.<br><br>Pl. aprítás, oldódás, halmazállapot-változás.'},
+ {e:'💥',t:'Kémiai változás',b:'A <b>részecskék szerkezetében</b> is változás történik, <b>új anyagok keletkeznek</b>. Röviden: <b>reakció</b>.'},
+ {e:'🤝',t:'Egyesülés és bomlás',b:'<b>Egyesülés</b>: két vagy több anyagból <b>egy</b> termék.<br><b>Bomlás</b>: egy anyagból <b>két vagy több</b> új anyag.'},
+ {e:'🌡️',t:'Exoterm és endoterm',b:'<b>Exoterm</b>: a rendszer hőt ad át a környezetének (hő szabadul fel).<br><b>Endoterm</b>: a rendszer hőt von el a környezetétől (hő nyelődik el).'}],
+ pairs:[['anyagi halmaz','nagyon sok részecske együttese'],['fizikai változás','nem keletkezik új anyag'],['kémiai változás','új anyag keletkezik'],['egyesülés','több anyagból egy termék'],['bomlás','egy anyagból több termék'],['exoterm','hő szabadul fel'],['endoterm','hő nyelődik el']]}
+];
+const ZM={};Z.forEach(z=>ZM[z.id]=z);
+
+const F=[
+/* z1: fizikai tulajdonságok */
+{z:'z1',i:'a1',q:'Melyik közismert anyag példáján ismertük meg az anyagok jellemzésének szempontjait?',a:'répacukor',alt:['cukor','kockacukor'],w:['konyhasó','magnézium','hipermangán']},
+{z:'z1',i:'a2',q:'Miből nyerik a cukrot hazánkban?',a:'cukorrépából',alt:['cukorrépa','répa'],w:['cukornádból','kukoricából','burgonyából']},
+{z:'z1',i:'a3',q:'Miből nyerik a cukrot a trópusi területeken?',a:'cukornádból',alt:['cukornád','nád'],w:['cukorrépából','rizsből','banánból']},
+{z:'z1',i:'a4',q:'Mi a répacukor képlete?',a:'C₁₂H₂₂O₁₁',w:['C₆H₁₂O₆','C₁₂H₂₂O₁₀','CO₂']},
+{z:'z1',i:'a5',q:'Milyen halmazállapotú a répacukor?',a:'szilárd',w:['folyékony','légnemű','gél']},
+{z:'z1',i:'a6',q:'Milyen színű a répacukor?',a:'fehér',w:['sárga','ezüstszürke','lilásszürke']},
+{z:'z1',i:'a7',q:'Milyen a répacukor szaga?',a:'szagtalan',alt:['nincs szaga','nincs'],w:['szúrós szagú','záptojásszagú','égett szagú']},
+{z:'z1',i:'a8',q:'Hány °C a répacukor olvadáspontja?',a:'186 °C',nums:[186],w:['28 °C','754 °C','1530 °C']},
+{z:'z1',i:'a9',q:'Mekkora a répacukor sűrűsége (g/cm³)?',a:'1,59 g/cm³',nums:[1,59],w:['0,59 g/cm³','2,71 g/cm³','1,74 g/cm³']},
+{z:'z1',i:'a10',soft:1,q:'Miért süllyed le a répacukor a víz aljára?',a:'a sűrűsége nagyobb a vízénél',w:['a sűrűsége kisebb a vízénél','az olvadáspontja magas','a színe fehér']},
+{z:'z1',i:'a11',q:'Sorolj fel három fizikai tulajdonságot!',need:3,list:['szín','szag','halmazállapot','keménység','oldhatóság','sűrűség','olvadáspont','forráspont'],lalt:{0:['színe'],1:['szaga'],2:['halmazállapota','halmazállapot'],3:['keménysége'],4:['oldódás','oldhatósága','oldódás mértéke'],5:['sűrűsége'],6:['olvadáspontja'],7:['forráspontja']}},
+{z:'z1',i:'a12',q:'Egyes fizikai tulajdonságok ____, ezért számadattal és mértékegységgel jellemezzük az anyagot. (Pl. olvadáspont, sűrűség.)',a:'mérhetők',alt:['mérhető','merheto','merhetok'],w:['elpárolognak','mindig színesek','kémiai tulajdonságok']},
+{z:'z1',i:'a13',soft:1,q:'Mire jellemzők a fizikai tulajdonságok?',a:'a nagyon sok részecskéből álló anyagi halmazra',w:['egyetlen molekulára','egyetlen atomra','csak a gázokra']},
+{z:'z1',i:'a14',q:'Hogyan nevezzük a nagyon sok részecskéből álló egységet, amelyre a fizikai tulajdonságok jellemzők?',a:'anyagi halmaz',alt:['halmaz'],w:['molekula','atom','oldat']},
+
+/* z2: kémiai tulajdonságok */
+{z:'z2',i:'b1',q:'Hogyan nevezzük a cukor hevítésekor keletkező, sokféle összetevőből álló anyagot?',a:'karamell',w:['hamu','szén-dioxid','magnézium-oxid']},
+{z:'z2',i:'b2',q:'Milyen anyagban kell megforgatni a cukrot, hogy elégethető legyen?',a:'hamu',alt:['hamuban','hamuba','hamuval'],w:['liszt','só','homok']},
+{z:'z2',i:'b3',q:'Mely két anyag keletkezik a cukor elégetésekor?',list:['szén-dioxid','víz'],lalt:{0:['szén-dioxid-gáz','szén-dioxid gáz','co2'],1:['vízgőz','h2o','vízpára']}},
+{z:'z2',i:'b4',q:'Mi keletkezésére utal a vízpára megjelenése a hideg üvegen a cukor égésekor?',a:'vízgőz keletkezése',alt:['vízgőz','vízgőz keletkezésére','víz','vízpára'],w:['szén-dioxid keletkezése','oxigén keletkezése','a cukor olvadása']},
+{z:'z2',i:'b5',q:'Mi történik, ha a répacukrot egyszerűen lángba tartjuk?',a:'nem gyullad meg',alt:['nem gyullad','nem ég'],w:['azonnal meggyullad','felrobban','kék lánggal ég']},
+{z:'z2',i:'b6',soft:1,q:'Milyenek a cukor égéstermékei?',a:'színtelenek és szagtalanok',w:['fehérek és szúrós szagúak','barnák és édes illatúak','feketék és szagtalanok']},
+{z:'z2',i:'b7',q:'A cukor egyik kémiai tulajdonsága: melegítés hatására ____ . (egy szó)',a:'bomlik',alt:['karamellizálódik','karamellé alakul','karamell lesz'],w:['olvad','párolog','kristályosodik']},
+{z:'z2',i:'b8',q:'A cukor másik kémiai tulajdonsága: hamuval bevonva ____ . (egy szó)',a:'meggyullad',alt:['elég','meggyújtható','ég','meggyújtható'],w:['megolvad','feloldódik','megfagy']},
+{z:'z2',i:'b9',q:'Melyik gázzal lép reakcióba a cukor az égésekor?',a:'oxigén',alt:['a levegő oxigénje','levegő oxigénje','oxigénnel'],w:['hidrogén','nitrogén','szén-dioxid']},
+{z:'z2',i:'b10',q:'Mi marad vissza a kémcsőben a cukor hosszú, erős hevítése után?',a:'szén',alt:['faszén','elszenesedik'],w:['vas','magnézium','kén']},
+{z:'z2',i:'b11',soft:1,q:'Mit mutatnak meg a kémiai tulajdonságok?',a:'milyen körülmények között alakul át az anyag, és közben milyen anyag keletkezik',w:['mekkora az olvadáspontja és a sűrűsége','milyen színű és szagú az anyag','oldódik-e vízben']},
+{z:'z2',i:'b12',soft:1,q:'Melyik a cukor kémiai tulajdonsága?',a:'hevítés hatására bomlik',w:['vízben jól oldódik','fehér színű','szilárd halmazállapotú']},
+{z:'z2',i:'b13',soft:1,q:'Hogyan változik a cukor színe olvadás közben?',a:'sárgul, barnul',w:['kékül, zöldül','fehérebb lesz','színtelenné válik']},
+
+/* z3: fizikai és kémiai változások */
+{z:'z3',i:'c1',strict:1,q:'Fizikai vagy kémiai változás: a cukor aprítása?',a:'fizikai',alt:['fizikai változás'],w:['kémiai']},
+{z:'z3',i:'c2',strict:1,q:'Fizikai vagy kémiai változás: a cukor oldása vízben?',a:'fizikai',alt:['fizikai változás'],w:['kémiai']},
+{z:'z3',i:'c3',strict:1,q:'Fizikai vagy kémiai változás: a cukor enyhe megolvasztása?',a:'fizikai',alt:['fizikai változás'],w:['kémiai']},
+{z:'z3',i:'c4',strict:1,q:'Fizikai vagy kémiai változás: a cukor elégetése?',a:'kémiai',alt:['kémiai változás','reakció'],w:['fizikai']},
+{z:'z3',i:'c5',strict:1,q:'Fizikai vagy kémiai változás: a magnézium megolvasztása?',a:'fizikai',alt:['fizikai változás'],w:['kémiai']},
+{z:'z3',i:'c6',strict:1,q:'Fizikai vagy kémiai változás: a hipermangán hevítés hatására bomlása?',a:'kémiai',alt:['kémiai változás','reakció'],w:['fizikai']},
+{z:'z3',i:'c7',soft:1,q:'Mit nevezünk fizikai változásnak?',a:'olyan változást, amely során nem keletkezik új anyag',w:['olyan változást, amely során új anyag keletkezik','olyan változást, amelynél a részecskék szerkezete is megváltozik','olyan változást, amely mindig hőfelszabadulással jár']},
+{z:'z3',i:'c8',q:'Azokat a változásokat, amelyek során új anyag keletkezik, ____ változásoknak nevezzük.',a:'kémiai',alt:['kémiai változás'],w:['fizikai','biológiai','hő']},
+{z:'z3',i:'c9',q:'Hogyan hívjuk egyszerűen a kémiai változásokat?',a:'reakció',alt:['reakciók','reakciónak','reakcióknak'],w:['oldódás','olvadás','halmazállapot-változás']},
+{z:'z3',i:'c10',q:'Melyek a legismertebb fizikai változások?',list:['halmazállapot-változások','oldódási folyamatok'],lalt:{0:['halmazállapot-változás','halmazállapot változás'],1:['oldódás','oldódási folyamat']}},
+{z:'z3',i:'c11',soft:1,q:'Mi változik meg fizikai változás során?',a:'az anyagi halmaz szerkezete',w:['a részecske szerkezete','mindkettő','egyik sem']},
+{z:'z3',i:'c12',soft:1,q:'Miért tekintjük a cukor égését kémiai változásnak?',a:'mert új anyagok (szén-dioxid és víz) keletkeznek',w:['mert a cukor megolvad','mert a cukor fehér','mert a cukor oldódik a vízben']},
+{z:'z3',i:'c13',soft:1,q:'Mi keletkezik kémiai változás során?',a:'új anyag',w:['csak más halmazállapotú ugyanaz az anyag','ugyanaz az anyag kisebb darabokban','oldat']},
+{z:'z3',i:'c14',q:'A fizikai változások során csak az anyagi halmaz szerkezete változik, a ____ szerkezete nem.',a:'részecske',alt:['részecskék','molekula'],w:['halmaz','oldat','kémcső']},
+
+/* z4: magnézium és hipermangán */
+{z:'z4',i:'d1',q:'Milyen színű a magnézium?',a:'ezüstszürke',alt:['ezüst','szürke','ezüstös'],w:['lilásszürke','fehér','vörösbarna']},
+{z:'z4',i:'d2',q:'Milyen színű a hipermangán (szilárd állapotban)?',a:'lilásszürke',alt:['lilás','lila'],w:['ezüstszürke','zöld','fekete']},
+{z:'z4',i:'d3',q:'Milyen színnel oldódik vízben a hipermangán?',a:'lila',alt:['lilás'],w:['zöld','kék','színtelen']},
+{z:'z4',i:'d4',q:'Mi a hipermangán tudományos neve?',a:'kálium-permanganát',alt:['permanganát','kmno4'],w:['kálium-manganát','mangán-dioxid','magnézium-oxid']},
+{z:'z4',i:'d5',q:'Mi a hipermangán képlete?',a:'KMnO₄',w:['MgO','K₂MnO₄','MnO₂']},
+{z:'z4',i:'d6',q:'Mi a magnézium vegyjele?',a:'Mg',w:['M','Mn','Ma']},
+{z:'z4',i:'d7',q:'Hány °C a magnézium olvadáspontja?',a:'650 °C',nums:[650],w:['186 °C','1107 °C','1530 °C']},
+{z:'z4',i:'d8',q:'Hány °C a magnézium forráspontja?',a:'1107 °C',nums:[1107],w:['650 °C','186 °C','754 °C']},
+{z:'z4',i:'d9',q:'Mekkora a magnézium sűrűsége (g/cm³)?',a:'1,74 g/cm³',nums:[1,74],w:['2,71 g/cm³','1,59 g/cm³','0,74 g/cm³']},
+{z:'z4',i:'d10',q:'Mekkora a hipermangán sűrűsége (g/cm³)?',a:'2,71 g/cm³',nums:[2,71],w:['1,74 g/cm³','1,59 g/cm³','3,71 g/cm³']},
+{z:'z4',i:'d11',q:'Melyik oldódik vízben: a magnézium vagy a hipermangán?',a:'hipermangán',alt:['kálium-permanganát','a hipermangán'],w:['magnézium']},
+{z:'z4',i:'d12',q:'Melyik anyag jól megmunkálható: a magnézium vagy a hipermangán?',a:'magnézium',alt:['a magnézium','mg'],w:['hipermangán']},
+{z:'z4',i:'d13',q:'Melyik vezeti az elektromos áramot: a magnézium vagy a hipermangán?',a:'magnézium',alt:['a magnézium','mg'],w:['hipermangán']},
+{z:'z4',i:'d14',q:'Mi történik a hipermangánnal hevítéskor: megolvad vagy bomlik?',a:'bomlik',alt:['bomlás','hevítésre bomlik'],w:['megolvad']},
+{z:'z4',i:'d15',q:'Sorolj fel három fémes tulajdonságot a magnézium példája alapján!',list:['jó hajlíthatóság','jó megmunkálhatóság','jó elektromos vezetés'],lalt:{0:['hajlíthatóság','hajlítható','jól hajlítható'],1:['megmunkálhatóság','megmunkálható','jól megmunkálható'],2:['elektromos vezetés','vezeti az áramot','elektromos vezetése','vezetés','elektromos áram vezetése']}},
+{z:'z4',i:'d16',soft:1,q:'Mit okozhat az égő magnézium lángjába nézés?',a:'látáskárosodást',w:['hallásromlást','bőrkiütést','szagláscsökkenést']},
+{z:'z4',i:'d17',q:'Ki javasolta a magnézium használatát fényforrásként a fényképezésben?',a:'Robert Bunsen',alt:['bunsen'],w:['Robert Boyle','Marie Curie','Alfred Nobel']},
+
+/* z5: egyesülés és bomlás */
+{z:'z5',i:'e1',q:'Mi keletkezik a magnézium égésekor?',a:'magnézium-oxid',alt:['mgo'],w:['magnézium-klorid','hipermangán','mangán-dioxid']},
+{z:'z5',i:'e2',soft:1,q:'Milyen a magnézium-oxid színe és megjelenése?',a:'fehér, porszerű',w:['ezüstszürke, fémes','fekete, kristályos','lila, folyékony']},
+{z:'z5',i:'e3',q:'Egészítsd ki a szóegyenletet: magnézium + ____ → magnézium-oxid',a:'oxigén',alt:['o2'],w:['hidrogén','nitrogén','víz']},
+{z:'z5',i:'e4',strict:1,q:'Hogyan nevezzük azt a kémiai reakciót, amelyben két vagy több kiindulási anyagból egy termék keletkezik?',a:'egyesülés',w:['bomlás','oldódás','olvadás']},
+{z:'z5',i:'e5',strict:1,q:'Hogyan nevezzük azt a kémiai változást, amelyben egy anyagból két vagy több új anyag keletkezik?',a:'bomlás',w:['egyesülés','párolgás','oldódás']},
+{z:'z5',i:'e6',strict:1,q:'Egyesülés vagy bomlás: a magnézium égése?',a:'egyesülés',w:['bomlás']},
+{z:'z5',i:'e7',strict:1,q:'Egyesülés vagy bomlás: a hipermangán hevítés hatására bomlása?',a:'bomlás',w:['egyesülés']},
+{z:'z5',i:'e8',q:'Melyik gáz keletkezik a hipermangán hevítésekor?',a:'oxigén',alt:['oxigéngáz','oxigén gáz'],w:['hidrogén','szén-dioxid','nitrogén']},
+{z:'z5',i:'e9',q:'Mivel mutatható ki a kémcsőben keletkező oxigén?',a:'parázsló gyújtópálca',alt:['gyújtópálca','parázsló gyújtópálcával','gyújtópálcával'],w:['égő magnéziumszalag','hideg főzőpohár','víz']},
+{z:'z5',i:'e10',q:'Mit tapasztalunk, ha parázsló gyújtópálcát tartunk a kémcső szájához a hipermangán hevítésekor?',a:'lángra lobban',alt:['lángra lobban és hevesen ég','hevesen ég','meggyullad','lobban'],w:['elalszik','kékre színeződik','nem történik semmi']},
+{z:'z5',i:'e11',strict:1,q:'Hogy hívják a hipermangán hevítése után maradó zöld, vízben oldódó anyagot?',a:'kálium-manganát',w:['kálium-permanganát','mangán-dioxid','magnézium-oxid']},
+{z:'z5',i:'e12',strict:1,q:'Hogy hívják a hipermangán hevítése után maradó fekete, vízben nem oldódó anyagot?',a:'mangán-dioxid',alt:['mno2'],w:['kálium-manganát','kálium-permanganát','magnézium-oxid']},
+{z:'z5',i:'e13',q:'Sorold fel a hipermangán bomlásának három termékét!',list:['oxigén','kálium-manganát','mangán-dioxid'],lalt:{0:['oxigéngáz','o2'],2:['mno2']}},
+{z:'z5',i:'e14',soft:1,q:'Mi történik a hipermangánnal hevítéskor?',a:'sercegni, pattogni kezd',w:['megolvad és elfolyósodik','felrobban','azonnal elpárolog']},
+{z:'z5',i:'e15',soft:1,q:'Melyik a magnézium kémiai tulajdonsága?',a:'lángba tartva könnyen meggyullad, és magnézium-oxiddá ég el',w:['vízben nem oldódik','ezüstszürke színű','jól hajlítható']},
+{z:'z5',i:'e16',q:'Melyik változás során keletkezik új anyag a magnéziummal: hajlítás, megolvasztás vagy égés?',a:'égés',alt:['égése','elégetés'],w:['hajlítás','megolvasztás']},
+
+/* z6: energiaváltozások */
+{z:'z6',i:'f1',strict:1,q:'Hogyan nevezzük azokat a változásokat, amelyek során hő szabadul fel?',a:'exoterm',alt:['exoterm folyamat','exoterm változás'],w:['endoterm','egyesülés','bomlás']},
+{z:'z6',i:'f2',strict:1,q:'Hogyan nevezzük azokat a változásokat, amelyek során hő nyelődik el?',a:'endoterm',alt:['endoterm folyamat','endoterm változás'],w:['exoterm','egyesülés','bomlás']},
+{z:'z6',i:'f3',strict:1,q:'Exoterm vagy endoterm: a magnézium égése?',a:'exoterm',w:['endoterm']},
+{z:'z6',i:'f4',strict:1,q:'Exoterm vagy endoterm: a hipermangán bomlása?',a:'endoterm',w:['exoterm']},
+{z:'z6',i:'f5',q:'Mi történik a hővel exoterm folyamat során?',a:'felszabadul',alt:['hő szabadul fel','hő felszabadul','hőt ad le','kiad','leadja'],w:['elnyelődik','nincs hőcsere a környezettel','csak a halmazállapot változik']},
+{z:'z6',i:'f6',q:'Exoterm változásnál a rendszer hőt ____ a környezetének.',a:'átad',alt:['ad át','átadja','ad','leadja','ad le'],w:['von el','nyel el','kap']},
+{z:'z6',i:'f7',q:'Endoterm változásnál a rendszer a környezetétől hőt ____ .',a:'von el',alt:['elvon','elnyel','nyel el','felvesz','vesz fel'],w:['ad át','leadja','termel']},
+{z:'z6',i:'f8',q:'A fizikai és kémiai változások mindig ____ járnak együtt.',a:'energiaváltozással',alt:['energiaváltozás','energia változással'],w:['színváltozással','hangeffektussal','tömegváltozással']},
+{z:'z6',i:'f9',soft:1,q:'Mit jelent leggyakrabban az energiaváltozás?',a:'hő felszabadulását vagy elnyelődését',w:['a szín megváltozását','a sűrűség megváltozását','a tömeg megváltozását']},
+{z:'z6',i:'f10',soft:1,q:'Merre áramlik a hő exoterm folyamatnál?',a:'a rendszerből a környezetbe',w:['a környezetből a rendszerbe','sehova, a rendszerben marad','a rendszer belsejében kering']},
+{z:'z6',i:'f11',soft:1,q:'Merre áramlik a hő endoterm folyamatnál?',a:'a környezetből a rendszerbe',w:['a rendszerből a környezetbe','sehova, a környezetben marad','a környezet belsejében kering']},
+{z:'z6',i:'f12',strict:1,q:'Melyik az exoterm folyamat példája?',a:'a magnézium égése',alt:['magnézium égése','magnézium égés'],w:['a hipermangán bomlása']},
+{z:'z6',i:'f13',strict:1,q:'Melyik az endoterm folyamat példája?',a:'a hipermangán bomlása',alt:['hipermangán bomlása','hipermangán bomlás'],w:['a magnézium égése']},
+
+/* z7: labor – a kockacukor vizsgálata (feladatlap) */
+{z:'z7',i:'g1',q:'Mi tilos a laboratóriumban a vegyszerekkel, még a cukorral is?',a:'megkóstolni',alt:['kóstolás','kóstolni','megkóstolás'],w:['megfigyelni a színét','kémcsőben melegíteni (felügyelettel)','dörzsmozsárban porítani']},
+{z:'z7',i:'g2',q:'Mivel fogjuk meg a kockacukrot az érzékszervi vizsgálatnál?',a:'fémcsipesszel',alt:['fémcsipesz','csipesz','fémcsipeszbe'],w:['kézzel','kémcsőfogóval','dörzsmozsárral']},
+{z:'z7',i:'g3',q:'Milyen a kockacukor színe, szaga és halmazállapota?',list:['fehér','szagtalan','szilárd']},
+{z:'z7',i:'g4',q:'Mivel (melyik eszközzel) törjük porrá a kockacukrot?',a:'dörzsmozsárral',alt:['dörzsmozsár','dörzsmozsárban'],w:['kémcsőfogóval','főzőpohárral','óraüveggel']},
+{z:'z7',i:'g5',q:'Milyen vizet öntünk a porrá őrölt cukorhoz?',a:'desztillált víz',alt:['desztillált'],w:['csapvíz','tengervíz','forró víz']},
+{z:'z7',i:'g6',soft:1,q:'Hol fogjuk meg a kémcsövet melegítéskor?',a:'a felső 1/3 részénél',w:['az alján','a közepénél','a legalján']},
+{z:'z7',i:'g7',q:'Mi történik a cukorral, ha a kémcsőben óvatosan melegítjük?',a:'megolvad',alt:['olvad','elfolyósodik','megolvasztjuk'],w:['meggyullad','elszenesedik','elpárolog']},
+{z:'z7',i:'g8',q:'Melyik vegyületet azonosítottuk a száraz, hideg főzőpohár segítségével a cukor égésekor?',a:'víz',alt:['vízgőz','vízpára','h2o'],w:['szén-dioxid','oxigén','hidrogén']},
+{z:'z7',i:'g9',soft:1,q:'Mit kell tenni a cukorral, mielőtt meggyújtjuk?',a:'meg kell forgatni a hamuban',w:['vízbe kell áztatni','porrá kell törni a dörzsmozsárban','a kémcsőben kell megolvasztani']},
+{z:'z7',i:'g10',q:'Hol végezzük a cukor meggyújtását?',a:'a tálca felett',alt:['tálca felett','tálcán','tálca'],w:['az asztal szélén','kézben tartva','a mosogató fölött']},
+{z:'z7',i:'g11',q:'Minek minősül a laboratóriumban a cukor is?',a:'vegyszer',alt:['vegyszernek'],w:['élelmiszer','nyersanyag','eszköz']},
+{z:'z7',i:'g12',q:'Hogyan törhető porrá a kockacukor a dörzsmozsárban: nagyon nehezen vagy viszonylag könnyen?',a:'viszonylag könnyen',alt:['könnyen'],w:['nagyon nehezen']},
+{z:'z7',i:'g13',q:'Mit tapasztalunk, ha a porrá őrölt cukorhoz desztillált vizet öntünk és kevergetjük?',a:'feloldódik',alt:['oldódik','feloldódik a vízben','eltűnik'],w:['leesik az aljára és nem oldódik','meggyullad','megfagy']},
+
+/* z8: fogalmak */
+{z:'z8',i:'h1',q:'Maga az anyag nagyon sok részecske (atom, molekula) ____ .',a:'halmaza',alt:['halmaz','anyagi halmaz'],w:['keveréke','oldata','vegyülete']},
+{z:'z8',i:'h2',q:'A szín, a szag, a halmazállapot és az oldhatóság a legfontosabb ____ tulajdonságok.',a:'fizikai',w:['kémiai','biológiai','anyagi']},
+{z:'z8',i:'h3',q:'Azt, hogy az anyag milyen körülmények között milyen anyagokká alakítható át, ____ tulajdonságoknak nevezzük.',a:'kémiai',w:['fizikai','biológiai','anyagi']},
+{z:'z8',i:'h4',q:'A fizikai változások során megváltozik a halmaz szerkezete, de ____ nem képződik.',a:'új anyag',alt:['anyag'],w:['új halmaz','új szín','új hőmérséklet']},
+{z:'z8',i:'h5',q:'A kémiai változások során a ____ szerkezetében is változás történik.',a:'részecskék',alt:['részecske'],w:['oldat','kémcső','hőmérséklet']},
+{z:'z8',i:'h6',q:'Az egyesülés során ____ anyagból egy termék keletkezik. (hány?)',a:'két vagy több',alt:['2 vagy több','több','két','kettő vagy több'],w:['egy','pontosan egy','mindig három']},
+{z:'z8',i:'h7',q:'A bomlás során ____ anyagból két vagy több új anyag keletkezik. (hány?)',a:'egy',alt:['egyetlen','1'],w:['két','három','több']},
+{z:'z8',i:'h8',soft:1,q:'Mi az anyagi halmaz?',a:'nagyon sok részecske halmaza',w:['egyetlen molekula','egyetlen atom','két anyag keveréke']},
+{z:'z8',i:'h9',soft:1,q:'Mi a kémiai változás?',a:'olyan változás, amely során új anyag keletkezik',w:['olyan változás, amely során csak a halmazállapot változik','olyan változás, amely során nem keletkezik új anyag','olyan változás, amely mindig hő felvételével jár']},
+{z:'z8',i:'h10',soft:1,q:'Mi a kémiai tulajdonság?',a:'az, hogy az anyag milyen körülmények között milyen anyagokká alakítható át',w:['az anyag színe, szaga és halmazállapota','az anyag olvadáspontja és sűrűsége','az, hogy az anyag mennyi részecskéből áll']},
+{z:'z8',i:'h11',soft:1,q:'Mi az egyesülés?',a:'két vagy több anyagból egy termék keletkezik',w:['egy anyagból két vagy több új anyag keletkezik','nem keletkezik új anyag','hő szabadul fel']},
+{z:'z8',i:'h12',soft:1,q:'Mi a bomlás?',a:'egy anyagból két vagy több új anyag keletkezik',w:['két vagy több anyagból egy termék keletkezik','nem keletkezik új anyag','hő nyelődik el']},
+{z:'z8',i:'h13',strict:1,q:'Fizikai vagy kémiai tulajdonság: a magnézium olvadáspontja (650 °C)?',a:'fizikai',alt:['fizikai tulajdonság'],w:['kémiai']},
+{z:'z8',i:'h14',strict:1,q:'Fizikai vagy kémiai tulajdonság: a cukor hamuban megforgatva meggyullad?',a:'kémiai',alt:['kémiai tulajdonság'],w:['fizikai']},
+{z:'z8',i:'h15',strict:1,q:'Fizikai vagy kémiai tulajdonság: a hipermangán vízben lila színnel oldódik?',a:'fizikai',alt:['fizikai tulajdonság'],w:['kémiai']},
+{z:'z8',i:'h16',strict:1,q:'Fizikai vagy kémiai tulajdonság: a magnézium vakító fehér fénnyel magnézium-oxiddá ég el?',a:'kémiai',alt:['kémiai tulajdonság'],w:['fizikai']}
+];
+
+/* sorrendbe rakós feladatok (zónánként) */
+const ORDERS={
+ z7:[
+  {e:'érzékszervi vizsgálat fémcsipesszel',y:'1. lépés',s:1},
+  {e:'porítás dörzsmozsárban',y:'2/a lépés',s:2},
+  {e:'oldás desztillált vízben',y:'2/b lépés',s:3},
+  {e:'melegítés: a cukor megolvad',y:'2/c lépés',s:4},
+  {e:'tovább melegítés: karamell, majd szén',y:'4/a lépés',s:5},
+  {e:'hamuval bevont cukor meggyújtása',y:'4/b lépés',s:6}
+ ]
+};
+
+
+/* ============ ÁLLAPOT ============ */
+const KEY='kemia7_anyagok_v1';
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||typeof S!=='object')S={};
+S=Object.assign({name:'',xp:0,stars:{},stats:{},tests:[],streak:{d:'',n:0},snd:true},S);
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const RANKS=[[0,'Újonc','🥽'],[300,'Laboráns','🧪'],[800,'Kutató','🔬'],[1500,'Vegyész','⚗️'],[2500,'Professzor','🎓'],[4000,'Nobel-jelölt','🏅'],[6000,'Legenda','⚛️']];
+function rank(){let r=0;RANKS.forEach((x,i)=>{if(S.xp>=x[0])r=i});return r}
+const RAR=[['',''],['RITKA','#3d8bff'],['EPIKUS','#b07cff'],['LEGENDÁS','#ffd23d']];
+const app=document.getElementById('app');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function sh(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function today(off){const d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function bumpStreak(){if(S.streak.d===today())return;S.streak.n=S.streak.d===today(-1)?S.streak.n+1:1;S.streak.d=today()}
+function streakNow(){return (S.streak.d===today()||S.streak.d===today(-1))?S.streak.n:0}
+function unlocked(i){return i===0||(S.stars[Z[i-1].id]||0)>=1}
+
+/* ============ HANG, EFFEKT ============ */
+let AC;
+function tone(seq){if(!S.snd)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;seq.forEach(([f,d,ty])=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ty||'triangle';o.frequency.value=f;g.gain.setValueAtTime(.16,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.8})}catch(e){}}
+const sOk=()=>tone([[660,.1],[880,.16]]),sNo=()=>{tone([[190,.22,'sawtooth']]);if(navigator.vibrate)navigator.vibrate(120)},sWin=()=>tone([[523,.12],[659,.12],[784,.12],[1047,.3]]);
+function confetti(n){const fx=document.getElementById('fx'),em=['🎉','⭐','👟','🔥','💎','👑','⚡'];for(let i=0;i<(n||36);i++){const e=document.createElement('i');e.textContent=em[i%em.length];e.style.left=Math.random()*100+'%';e.style.fontSize=16+Math.random()*22+'px';e.style.animationDuration=1.6+Math.random()*1.8+'s';e.style.animationDelay=Math.random()*.6+'s';fx.appendChild(e);setTimeout(()=>e.remove(),4500)}}
+
+/* ============ VÁLASZ-ELLENŐRZÉS ============ */
+function norm(s){return String(s).replace(/[₀-₉]/g,c=>c.charCodeAt(0)-8320).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim().replace(/^(az|a|grof) /,'')}
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=[];for(let j=0;j<=n;j++)p[j]=j;for(let i=1;i<=m;i++){let c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+function mStr(inp,cands,strict){const n=norm(inp);if(!n)return 'no';const cs=cands.map(norm);if(cs.includes(n))return 'ok';if(strict)return 'no';for(const c of cs){if(/\d/.test(c)||c.length<4)continue;if(lev(n,c)<=(c.length>=8?2:1))return 'typo'}return 'no'}
+function mNums(inp,nums){let s=norm(inp).replace(/\b(g|cm|cm3|c|fok|celsius|foknal|foktol|grad)\b/g,' ');let a=(s.match(/\d+/g)||[]).map(Number);return a.length===nums.length&&a.every((x,i)=>x===nums[i])?'ok':'no'}
+function check(f,inp){return f.nums?mNums(inp,f.nums):mStr(inp,[f.a].concat(f.alt||[]),f.strict)}
+function checkList(f,inps){const used={},res=[];inps.forEach(v=>{let hit=-1;f.list.forEach((it,k)=>{if(hit<0&&!used[k]&&mStr(v,[it].concat((f.lalt||{})[k]||[]))!=='no')hit=k});if(hit>=0)used[hit]=1;res.push(hit)});return res}
+function stat(id,ok){const s=S.stats[id]||(S.stats[id]={o:0,b:0});ok?s.o++:s.b++}
+
+/* ============ KÉPERNYŐK ============ */
+let tab='map';
+function nav(){return `<div class="nav"><div>${[['map','🗺️','Pálya'],['train','💪','Edzés'],['locker','👟','Szekrény'],['stats','📊','Eredmények']].map(t=>`<button class="${tab===t[0]?'on':''}" onclick="go('${t[0]}')"><b>${t[1]}</b>${t[2]}</button>`).join('')}</div></div>`}
+function go(t){tab=t;({map:home,train:trainScr,locker:locker,stats:statsScr})[t]();window.scrollTo(0,0)}
+function header(){const r=rank(),nx=RANKS[r+1],lo=RANKS[r][0],pc=nx?Math.round((S.xp-lo)/(nx[0]-lo)*100):100;
+ return `<div class="hdr"><div class="ava">${RANKS[r][2]}</div><div style="flex:1;min-width:0"><div class="nm">${esc(S.name||'Játékos')}</div><div class="rank">${RANKS[r][1]} · ${S.xp} XP</div><div class="bar" style="margin-top:5px"><i style="width:${pc}%"></i></div></div><div class="pill">🔥 ${streakNow()}</div></div>`}
+function starsH(n){return `<span class="stars">${[1,2,3].map(i=>`<span class="${i<=n?'':'off'}">⭐</span>`).join('')}</span>`}
+function home(){
+ if(!S.name&&!S.started)return welcome();
+ let cur=Z.findIndex((z,i)=>unlocked(i)&&!(S.stars[z.id]>=1));
+ const off=[-56,0,56,0];
+ const best=S.tests.length?Math.max(...S.tests.map(t=>t.p)):null;
+ app.innerHTML=header()+`<div class="path">${Z.map((z,i)=>{const u=unlocked(i);return `<button class="node ${u?'':'lock'} ${i===cur?'cur':''}" style="--c:${z.c};transform:translateX(${off[i%4]}px)" onclick="${u?`zone('${z.id}')`:'lockedMsg()'}"><span class="orb">${u?z.e:'🔒'}</span><span class="lb">${i+1}. ${z.n}</span>${starsH(S.stars[z.id]||0)}</button>`}).join('')}
+ <button class="node boss" onclick="testIntro()"><span class="orb">👑</span><span class="lb">PRÓBADOLGOZAT</span><span class="mut" style="font-size:13px;font-weight:700">${best===null?'még nem írtad meg':'legjobb: '+best+'%'}</span></button></div>`+nav();
+}
+function lockedMsg(){sNo();alert('Előbb szerezz 1 csillagot az előző pályán!')}
+function welcome(){app.innerHTML=`<div class="gap" style="padding-top:8vh"><div class="big">🧪</div><h1 class="ctr" style="font-size:34px;font-weight:900">KÉMIA<br><span style="color:var(--cy)">LABOR</span></h1><p class="ctr mut" style="font-size:17px;line-height:1.5">8 pálya az anyagok tulajdonságairól. Csillagok, XP, ritka cuccok.<br>A végén a főellenség: a próbadolgozat.</p><input class="inp" id="nm" maxlength="16" placeholder="Játékosneved" autocomplete="off"><button class="btn lime" onclick="S.name=document.getElementById('nm').value.trim();S.started=1;save();home()">KEZDJÜK! 🚀</button></div>`}
+
+function zone(id){const z=ZM[id],st=S.stars[id]||0;
+ const b=(n,cls,em,t,sub)=>`<button class="btn ${cls}" ${st<n-1?'disabled':''} onclick="startRound('${id}',${n})">${em} ${t} ${st>=n?'✅':''}<small>${st<n-1?'🔒 előbb az előző szint':sub}</small></button>`;
+ app.innerHTML=`<div class="row" style="margin-bottom:14px"><button class="back" onclick="home()">← Pálya</button><div class="sp"></div>${starsH(st)}</div>
+ <div class="gap"><div class="row"><div class="ava" style="background:${z.c}">${z.e}</div><h2 style="font-size:25px;font-weight:900">${z.n}</h2></div>
+ <div class="rap">${z.rap.join('<br>')}</div>
+ <button class="btn ghost" onclick="reel('${id}',0)">📱 Pörgető<small>${z.cards.length} kártya – itt van minden, amit tudni kell</small></button>
+ ${b(1,'','⭐','1. szint: Felderítés','választós kérdések')}
+ ${b(2,'mg','⭐⭐','2. szint: Harc','vegyes – már gépelni is kell')}
+ ${b(3,'yel','⭐⭐⭐','3. szint: Mester','mindent fejből, mint a dolgozatban')}
+ </div>`;window.scrollTo(0,0)}
+function reel(id,i){const z=ZM[id],c=z.cards[i],last=i===z.cards.length-1;
+ let el=document.getElementById('reel');if(!el){el=document.createElement('div');el.id='reel';el.className='reel';document.body.appendChild(el)}
+ el.innerHTML=`<div class="dots">${z.cards.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div><div class="body"><div class="em">${c.e}</div><h2>${c.t}</h2><div class="tx">${c.b}</div></div>
+ <div class="ft"><button class="btn ghost" style="width:auto;padding:15px 20px" onclick="${i?`reel('${id}',${i-1})`:'closeReel()'}">${i?'←':'✕'}</button><button class="btn ${last?'lime':''}" onclick="${last?`closeReel();zone('${id}')`:`reel('${id}',${i+1})`}">${last?'MEGVAN! ✔':'TOVÁBB →'}</button></div>`}
+function closeReel(){const el=document.getElementById('reel');if(el)el.remove()}
+
+function locker(){app.innerHTML=header()+`<h2 style="margin:10px 0 4px;font-weight:900">👟 Szekrény</h2><p class="mut" style="margin:0 0 14px">Minden pálya ad egy cuccot. Több csillag = ritkább változat.</p><div class="gap">${Z.map(z=>{const st=S.stars[z.id]||0;return `<div class="loot ${st?'':'lock'}" style="--r:${st?RAR[st][1]:''}"><div class="ic">${st?z.loot[0]:'❔'}</div><div><div class="rr">${st?RAR[st][0]:'ZÁROLVA'}</div><b>${z.loot[1]}</b><div class="mut" style="font-size:13px">${z.n}</div></div></div>`}).join('')}
+ ${(()=>{const ok=S.tests.some(t=>t.p>=90);return `<div class="loot ${ok?'':'lock'}" style="--r:#ffd23d"><div class="ic">${ok?'👑':'❔'}</div><div><div class="rr">${ok?'MITIKUS':'ZÁROLVA'}</div><b>Nobel-érem</b><div class="mut" style="font-size:13px">Próbadolgozat 90% felett</div></div></div>`})()}</div>`+nav()}
+
+function weak(){return F.filter(f=>!f.soft&&(S.stars[f.z]||0)>=1).map(f=>{const s=S.stats[f.i];return {f,sc:(s?s.o-2*s.b:-.5)+Math.random()*.4}}).sort((a,b)=>a.sc-b.sc)}
+function trainScr(){const w=weak();app.innerHTML=header()+`<h2 style="margin:10px 0 4px;font-weight:900">💪 Edzés</h2><p class="mut" style="margin:0 0 14px;line-height:1.5">A játék megjegyzi, mit rontottál el, és azokat kérdezi újra – fejből, gépelve.</p>${w.length?`<button class="btn mg" onclick="startTrain()">GYENGE PONTOK EDZÉSE<small>10 kérdés a már megnyitott pályákból</small></button>`:`<div class="card mut">Előbb teljesíts legalább egy pályát 1 csillagra.</div>`}<div style="height:14px"></div><button class="btn yel" onclick="testIntro()">👑 PRÓBADOLGOZAT<small>28 kérdés, minden fejből, a végén jegy</small></button>`+nav()}
+
+function statsScr(){const w=weak().filter(x=>S.stats[x.f.i]&&S.stats[x.f.i].b>0).slice(0,8);
+ const fmt=d=>{const t=new Date(d);return t.getFullYear()+'.'+String(t.getMonth()+1).padStart(2,'0')+'.'+String(t.getDate()).padStart(2,'0')+'. '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')};
+ app.innerHTML=header()+`<h2 style="margin:10px 0 12px;font-weight:900">📊 Eredmények</h2><div class="gap">
+ <div class="card"><b>Próbadolgozatok</b>${S.tests.length?`<table><tr><th>Mikor</th><th>Eredmény</th><th>Jegy</th></tr>${S.tests.slice().reverse().map(t=>`<tr><td>${fmt(t.d)}</td><td><b>${t.p}%</b></td><td>${t.g}</td></tr>`).join('')}</table>`:`<p class="mut" style="margin:8px 0 0">Még nincs megírt próbadolgozat.</p>`}</div>
+ <div class="card"><b>Pályák</b><table>${Z.map(z=>`<tr><td>${z.e} ${z.n}</td><td style="text-align:right">${starsH(S.stars[z.id]||0)}</td></tr>`).join('')}</table></div>
+ <div class="card"><b>Amit még gyakorolni kell</b>${w.length?w.map(x=>`<p style="margin:10px 0 0;font-size:15px;line-height:1.4">${x.f.q}<br><b style="color:var(--lime)">${x.f.list?x.f.list.join(', '):x.f.a}</b> <span class="mut">(${S.stats[x.f.i].b}× hibás)</span></p>`).join(''):`<p class="mut" style="margin:8px 0 0">Nincs feljegyzett hiba.</p>`}</div>
+ <button class="btn ghost" onclick="S.snd=!S.snd;save();statsScr()">${S.snd?'🔊 Hang: BE':'🔇 Hang: KI'}</button>
+ <button class="btn ghost" onclick="if(confirm('Biztosan törlöd az összes eredményt és kezded elölről?')){localStorage.removeItem(KEY);location.reload()}">🗑️ Minden törlése</button></div>`+nav()}
+
+/* ============ JÁTÉKMENET ============ */
+let L;
+function build(z,star){const fs=sh(F.filter(f=>f.z===z));let qs=[];
+ if(star===1)qs=fs.filter(f=>f.w).slice(0,9).map(f=>({f,mode:'mc'}));
+ else if(star===2){let t=0;fs.slice(0,11).forEach(f=>qs.push({f,mode:f.list?'list':f.soft?'mc':(t++%2?'mc':'type'),hint:1}))}
+ else qs=fs.filter(f=>!f.soft).slice(0,12).map(f=>({f,mode:f.list?'list':'type'}));
+ const zo=ZM[z];if(zo.pairs&&star<3)qs.splice(Math.min(4,qs.length),0,{mode:'pair',pairs:sh(zo.pairs).slice(0,4)});
+ if(ORDERS[z]&&star>1)qs.splice(3,0,{mode:'order',items:sh(ORDERS[z]).slice(0,4)});
+ return qs}
+function startRound(z,star){L={kind:'round',z,star,qs:build(z,star),i:0,hearts:3,combo:0,xp:0,done:0};L.total=L.qs.length;renderQ()}
+function startTrain(){L={kind:'train',qs:weak().slice(0,10).map(x=>({f:x.f,mode:x.f.list?'list':'type'})),i:0,hearts:99,combo:0,xp:0,done:0};L.total=L.qs.length;renderQ()}
+function testIntro(){app.innerHTML=`<div class="gap" style="padding-top:5vh"><div class="big">👑</div><h1 class="ctr" style="font-weight:900">PRÓBADOLGOZAT</h1><div class="card" style="line-height:1.6;font-size:16px">• 28 kérdés az egész anyagból<br>• mindent <b>fejből</b> kell beírni, segítség nincs<br>• közben nem látod, mi jó és mi nem<br>• a végén <b>százalék és jegy</b>, és megnézheted a hibáidat</div><button class="btn yel" onclick="startTest()">INDÍTÁS</button><button class="btn ghost" onclick="go('map')">Vissza</button></div>`;window.scrollTo(0,0)}
+function startTest(){const per={z1:4,z2:4,z3:3,z4:4,z5:4,z6:3,z7:3,z8:3};let qs=[];Z.forEach(z=>{qs=qs.concat(sh(F.filter(f=>f.z===z.id&&!f.soft)).slice(0,per[z.id]).map(f=>({f,mode:f.list?'list':'type'})))});
+ L={kind:'test',qs,i:0,hearts:99,combo:0,xp:0,done:0,total:qs.length,rec:[]};renderQ()}
+function quit(){if(confirm(L.kind==='test'?'Kilépsz? A dolgozat eredménye elvész.':'Kilépsz a körből?'))go('map')}
+
+function renderQ(){const q=L.qs[L.i];let body='';
+ const tagTxt={mc:'Válaszd ki',type:'Írd be fejből',list:'Sorold fel',pair:'Párosítsd',order:'Sorrend'}[q.mode];
+ if(q.mode==='mc'){q.opts=q.opts||sh([q.f.a].concat(sh(q.f.w).slice(0,3)));body=`<div class="qt">${q.f.q}</div><div class="opts">${q.opts.map((o,i)=>`<button class="opt" onclick="ansMc(${i})">${o}</button>`).join('')}</div>`}
+ else if(q.mode==='type'){const num=q.f.nums&&q.f.nums.length===1;body=`<div class="qt">${q.f.q}</div><input id="inp" class="inp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="${q.f.nums?'szám…':'válasz…'}" onkeydown="if(event.key==='Enter')ansType()">${q.hint&&!q.f.nums?`<button class="hint" id="hb" onclick="hint()">💡 Segítség (fele XP)</button>`:''}<button class="btn" id="chk" onclick="ansType()">ELLENŐRZÉS</button>`}
+ else if(q.mode==='list'){const n=q.f.need||q.f.list.length;body=`<div class="qt">${q.f.q}</div>${Array.from({length:n},(_,i)=>`<input class="inp li" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="${i+1}." onkeydown="if(event.key==='Enter')liNext(${i})">`).join('')}<button class="btn" id="chk" onclick="ansList()">ELLENŐRZÉS</button>`}
+ else if(q.mode==='pair'){q.L=sh(q.pairs.map((p,i)=>i));q.R=sh(q.pairs.map((p,i)=>i));q.sel=null;q.left=q.pairs.length;q.miss=0;body=`<div class="qt">Koppints az összetartozó párokra!</div><div class="pairs">${q.L.map((l,k)=>`<button class="opt" id="pl${l}" onclick="pairTap('l',${l})">${q.pairs[l][0]}</button><button class="opt" id="pr${q.R[k]}" onclick="pairTap('r',${q.R[k]})">${q.pairs[q.R[k]][1]}</button>`).join('')}</div>`}
+ else{q.next=0;q.miss=0;q.sorted=q.items.slice().sort((a,b)=>a.s-b.s);body=`<div class="qt">Koppints rájuk a kísérlet sorrendjében! (az első lépéssel kezdd)</div><div class="opts">${q.items.map((d,i)=>`<button class="opt" id="or${i}" onclick="orderTap(${i})">${d.e.charAt(0).toUpperCase()+d.e.slice(1)}</button>`).join('')}</div>`}
+ app.innerHTML=`<div class="ltop"><button class="x" onclick="quit()">✕</button><div class="bar" style="flex:1"><i style="width:${Math.round(L.done/L.total*100)}%"></i></div>${L.kind==='round'?`<span class="hearts">${'❤️'.repeat(L.hearts)}${'🖤'.repeat(3-L.hearts)}</span>`:L.kind==='test'?`<span class="pill">${L.i+1}/${L.total}</span>`:''}${L.combo>=3&&L.kind!=='test'?`<span class="combo">🔥x${L.combo}</span>`:''}</div><span class="tag">${tagTxt}</span>${body}`;
+ window.scrollTo(0,0);const inp=document.querySelector('.inp');if(inp)setTimeout(()=>inp.focus(),60)}
+function hint(){const q=L.qs[L.i];q.hinted=1;document.getElementById('hb').outerHTML=`<p class="mut" style="font-size:18px;letter-spacing:3px;margin:0 0 12px;font-weight:800">${q.f.a.split(' ').map(w=>w[0]+'·'.repeat(w.length-1)).join('  ')}</p>`}
+function liNext(i){const a=document.querySelectorAll('.li');if(a[i+1])a[i+1].focus();else ansList()}
+function lock(){document.querySelectorAll('.opt,.inp,#chk,#hb').forEach(e=>{e.disabled=true;e.style.pointerEvents='none'})}
+
+function ansMc(i){const q=L.qs[L.i],ok=q.opts[i]===q.f.a,bs=document.querySelectorAll('.opt');lock();bs[i].classList.add(ok?'ok':'no');bs[q.opts.indexOf(q.f.a)].classList.add('ok');stat(q.f.i,ok);settle(ok,10,ok?'':`Helyesen: <b>${q.f.a}</b>`)}
+function ansType(){const q=L.qs[L.i],el=document.getElementById('inp'),v=el.value;if(!v.trim()&&L.kind!=='test'){el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),300);return}
+ const r=check(q.f,v),ok=r!=='no';
+ if(L.kind==='test'){L.rec.push({q:q.f.q,g:v,r:q.f.a,p:ok?1:0,m:1,id:q.f.i});stat(q.f.i,ok);L.done++;return next()}
+ lock();el.classList.add(ok?'ok':'no');stat(q.f.i,ok);settle(ok,q.hinted?10:20,ok?(r==='typo'?`Kis elírás – pontosan így: <b>${q.f.a}</b>`:''):`Helyesen: <b>${q.f.a}</b>`)}
+function ansList(){const q=L.qs[L.i],els=[...document.querySelectorAll('.li')],vals=els.map(e=>e.value),need=q.f.need||q.f.list.length;
+ if(vals.every(v=>!v.trim())&&L.kind!=='test'){els[0].classList.add('shake');setTimeout(()=>els[0].classList.remove('shake'),300);return}
+ const res=checkList(q.f,vals),hits=res.filter(x=>x>=0).length,ok=hits>=need;
+ if(L.kind==='test'){L.rec.push({q:q.f.q,g:vals.filter(v=>v.trim()).join(', '),r:q.f.list.join(', '),p:hits,m:need,id:q.f.i});stat(q.f.i,ok);L.done++;return next()}
+ lock();els.forEach((e,k)=>e.classList.add(res[k]>=0?'ok':'no'));stat(q.f.i,ok);settle(ok,30,(ok?'':`${hits}/${need} megvan. `)+`A teljes lista: <b>${q.f.list.join(', ')}</b>`)}
+function pairTap(side,i){const q=L.qs[L.i],el=document.getElementById('p'+side+i);
+ if(!q.sel||q.sel.side===side){document.querySelectorAll('.opt.sel').forEach(e=>e.classList.remove('sel'));q.sel={side,i};el.classList.add('sel');return}
+ const o=document.getElementById('p'+q.sel.side+q.sel.i);o.classList.remove('sel');
+ if(q.sel.i===i){[el,o].forEach(e=>e.classList.add('ok','gone'));q.left--;if(S.snd)tone([[740,.07]]);if(!q.left)settle(q.miss===0,15,q.miss?'Volt benne tévesztés – a kör végén visszajön.':'')}
+ else{q.miss++;[el,o].forEach(e=>{e.classList.add('no','shake');setTimeout(()=>e.classList.remove('no','shake'),350)});sNo()}
+ q.sel=null}
+function orderTap(i){const q=L.qs[L.i],el=document.getElementById('or'+i);
+ if(q.items[i]===q.sorted[q.next]){q.next++;el.classList.add('ok');el.style.pointerEvents='none';el.innerHTML=`<span class="n">${q.next}</span>${el.textContent} <span class="y">${q.items[i].y}</span>`;if(S.snd)tone([[740,.07]]);
+  if(q.next===q.items.length)settle(q.miss===0,15,q.miss?'Volt benne tévesztés – a kör végén visszajön.':'')}
+ else{q.miss++;el.classList.add('no','shake');setTimeout(()=>el.classList.remove('no','shake'),350);sNo()}}
+
+function settle(ok,xp,msg){const q=L.qs[L.i];
+ if(ok){L.combo++;L.done++;const g=xp+(L.combo>=3?5:0);L.xp+=g;sOk()}
+ else{L.combo=0;if(L.kind==='round')L.hearts--;sNo();if(L.hearts>0){const c={mode:q.mode,f:q.f,hint:q.hint,pairs:q.pairs,items:q.items};L.qs.push(c)}}
+ const good=['Ez az! 🔥','Szép! 💪','Pontos! 🎯','Megy ez! ⚡','Profi! 👑'];
+ const d=document.createElement('div');d.className='fb '+(ok?'ok':'no');d.innerHTML=`<div><h3>${ok?good[Math.floor(Math.random()*good.length)]:'Most nem jött be 😬'}</h3>${msg?`<p>${msg}</p>`:'<p></p>'}<button class="btn ${ok?'lime':'ghost'}" id="nx" onclick="next()">TOVÁBB</button></div>`;
+ document.body.appendChild(d);setTimeout(()=>{const b=document.getElementById('nx');if(b)b.focus()},50)}
+function next(){document.querySelectorAll('.fb').forEach(e=>e.remove());L.i++;
+ if(L.kind==='round'&&L.hearts<=0)return failed();
+ if(L.i>=L.qs.length)return L.kind==='test'?testDone():roundDone();
+ renderQ()}
+function failed(){app.innerHTML=`<div class="gap ctr" style="padding-top:12vh"><div class="big">💔</div><h1 style="font-weight:900">Elfogytak az életek</h1><p class="mut" style="font-size:17px">Semmi gáz. Pörgesd át a kártyákat, és fuss neki újra.</p><button class="btn" onclick="startRound('${L.z}',${L.star})">ÚJRA 🔁</button><button class="btn ghost" onclick="zone('${L.z}');reel('${L.z}',0)">📱 Pörgető</button><button class="btn ghost" onclick="go('map')">Pálya</button></div>`}
+function roundDone(){let bonus=0,lootMsg='';const r0=rank();
+ if(L.kind==='round'){const z=ZM[L.z],old=S.stars[L.z]||0;if(L.star>old){S.stars[L.z]=L.star;bonus=50*L.star;lootMsg=`<div class="loot" style="--r:${RAR[L.star][1]};text-align:left"><div class="ic">${z.loot[0]}</div><div><div class="rr">${old?'FEJLESZTVE → ':'ÚJ CUCC · '}${RAR[L.star][0]}</div><b>${z.loot[1]}</b></div></div>`}}
+ S.xp+=L.xp+bonus;bumpStreak();save();sWin();confetti();
+ const up=rank()>r0?`<div class="card" style="border-color:var(--yel)"><b style="color:var(--yel)">RANGLÉPÉS!</b> Új rangod: ${RANKS[rank()][2]} ${RANKS[rank()][1]}</div>`:'';
+ const nxt=L.kind==='round'?(L.star<3?`<button class="btn mg" onclick="startRound('${L.z}',${L.star+1})">KÖVETKEZŐ SZINT →</button>`:''):'';
+ app.innerHTML=`<div class="gap ctr" style="padding-top:8vh"><div class="big">${L.kind==='round'?'⭐'.repeat(L.star):'💪'}</div><h1 style="font-weight:900">${L.kind==='round'?'Szint teljesítve!':'Edzés kész!'}</h1><div class="row" style="justify-content:center"><span class="pill">+${L.xp+bonus} XP</span><span class="pill">🔥 ${streakNow()} nap</span></div>${lootMsg}${up}${nxt}<button class="btn ${nxt?'ghost':'lime'}" onclick="go('map')">VISSZA A PÁLYÁRA</button></div>`;window.scrollTo(0,0)}
+function testDone(){const pts=L.rec.reduce((a,r)=>a+Math.min(r.p,r.m),0),max=L.rec.reduce((a,r)=>a+r.m,0),p=Math.round(pts/max*100),g=p>=90?5:p>=75?4:p>=60?3:p>=40?2:1;
+ S.tests.push({d:Date.now(),p,g});S.xp+=p*3;bumpStreak();save();if(p>=75){sWin();confetti(p>=90?70:36)}
+ const bad=L.rec.filter(r=>r.p<r.m),d=new Date();
+ app.innerHTML=`<div class="gap ctr" style="padding-top:4vh"><div class="card" style="border:2px solid var(--yel)"><div class="mut" style="font-weight:800;letter-spacing:2px;font-size:12px">PRÓBADOLGOZAT · ${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}.</div><div style="font-weight:900;font-size:20px;margin:4px 0">${esc(S.name||'Játékos')}</div><div class="grade">${g}</div><div style="font-size:26px;font-weight:900">${p}%</div><div class="mut">${pts} / ${max} pont · becsült jegy</div>${p===100?'<p style="font-weight:900;color:var(--lime);margin:10px 0 0">HIBÁTLAN! Mutasd meg apának és anyának! 📸</p>':p>=90?'<p style="font-weight:800;color:var(--lime);margin:10px 0 0">Megvan a Nobel-érem! 🏅</p>':''}</div>
+ <span class="pill" style="align-self:center">+${p*3} XP</span>
+ ${bad.length?`<h3 style="text-align:left;margin-top:8px">Ezeket nézd át (${bad.length}):</h3>${bad.map(r=>`<div class="rev" style="text-align:left">${r.q}<br><span class="mut">Te: ${r.g.trim()?esc(r.g):'–'}</span><br><b>${r.r}</b></div>`).join('')}`:''}
+ ${bad.length?'<button class="btn mg" onclick="startTrain()">💪 HIBÁK GYAKORLÁSA</button>':''}<button class="btn yel" onclick="startTest()">ÚJ DOLGOZAT 🔁</button><button class="btn ghost" onclick="go('map')">VISSZA A PÁLYÁRA</button></div>`;window.scrollTo(0,0)}
+
+home();
+</script>
+</body>
+</html>
